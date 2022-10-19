@@ -1,0 +1,3 @@
+[submodule "src/splat"]
+	path = src/splat
+	url = https://github.com/hoche/splat.git

@@ -1,0 +1,207 @@
+<!doctype html5>
+<html>
+ <head>
+  <title>SPLAT plot generator</title>
+  <script src="/js/jquery.min.js"></script>
+ </head>
+ <style>
+ *, body {
+    background-color: #0c0c0c;
+    color: #c0c0c0;
+ }
+
+ h1, h2, h3, h4 {
+   padding: 0px;
+   margin: 0px;
+   text-align: center;
+ }
+
+ input {
+    border-radius: 9px;
+ }
+
+ .user-form {
+    padding:20px;
+ }
+
+ .user-form .field {
+    padding: 4px;
+    margin:1px;
+    background-color: #0f0f0f
+  }
+
+ .user-form .field label {
+    display:inline-block;
+    width:120px;
+    margin-left:5px;
+    background-color: #0f0f0f;
+  }
+
+ .user-form .field input {
+    display:inline-block;
+ }
+
+ fieldset {
+   padding: 0px;
+   margin: 0px;
+ }
+
+ form {
+   padding: 0px;
+   margin; 0px;
+ }
+
+ .alert {
+  background: repeating-linear-gradient(
+   135deg,
+   #dc6d60,
+   #dc6d60 10px,
+   #a85246 10px,
+   #a85246 20px
+  );
+ }
+
+ input:disabled {
+  background: repeating-linear-gradient(
+   135deg,
+   #606060,
+   #606060 10px,
+   #a0a0a0 10px,
+   #a0a0a0 20px
+  );
+ }
+
+ input:disabled:hover,
+ input:disabled:active,
+ input:disabled:focus {
+   background-color: red;
+ }
+ </style>
+ <script>
+ $(document).ready(function() {
+    if (typeof(error_data) != "undefined") {
+       alert("Error: " + error_data);
+    }
+
+    // check for form data that was passed through...
+    if (typeof(form_data) != "undefined") {
+       console.log(form_data);
+    }
+
+    var userCall = document.getElementById('user_callsign');
+    if ($('input#user_callsign').val() == "") {
+       if (sessionStorage.getItem('callsign')) {
+          userCall.value = sessionStorage['callsign'];
+       }
+    }
+    userCall.addEventListener("change", function() {
+       sessionStorage.setItem("callsign", userCall.value);
+    });
+
+    var userEmail = document.getElementById('user_email');
+    if ($('input#user_email').val() == "") {
+       if (sessionStorage.getItem('email')) {
+          userEmail.value = sessionStorage['email'];
+       }
+    }
+    userEmail.addEventListener("change", function() {
+       sessionStorage.setItem("email", userEmail.value);
+    });
+ });
+ </script>
+ <body>
+  <h1>SPLAT plot generator</h1></br>
+  Complete the form and click enqueue below.<br/>
+  <form id="plot" name="plot" class="user-form" method="post">
+   <fieldset id="user">
+    <h3>User</h3>
+    <div class="field">
+     <label for="user_callsign">Callsign</label>
+     <input name="user_callsign" id="user_callsign" size="8" autofocus/>
+    </div>
+    <div class="field">
+     <label for="user_email">Email</label>
+     <input name="user_email" id="user_email" size="50%" type="email"/>
+    </div>
+   </fieldset>
+   <fieldset id="xmit">
+    <h3>Transmitter</h3>
+    <div class="field">
+     <label for="xmit_power">Output Power (Watts)</label>
+     <input name="xmit_power" id="xmit_power" size="5"/>
+    </div>
+    <div class="field">
+     <label for="xmit_freq">Frequency (MHz)</label>
+     <input name="xmit_freq" id="xmit_freq" size="8"/>
+    </div>
+    <div class="field">
+     <label for="xmit_label">Label</label>
+     <input name="xmit_label" id="xmit_label" size="50%"/>
+    </div>
+    <div class="field">
+     <label for="xmit_addr">Address</label>
+     <input name="xmit_addr" id="xmit_addr" size="50%" disabled/>
+    </div>
+    <center>- OR -</center>
+    <div class="field">
+     <label for="xmit_lat">Latitude *</label>
+     <input name="xmit_lat" id="xmit_lat" size="12"/>
+    </div>
+    <div class="field">
+     <label for="xmit_lont">Longitude *</label>
+     <input name="xmit_lon" id="xmit_lon" size="12"/><br/>
+    </div>
+    * Use WGS-84 decimal notation.<br/>
+    <div class="field">
+     <label for="xmit_height">Antennae Height (M)</label>
+     <input name="xmit_height" id="xmit_height" size="7"/><br/>
+    </div>
+   </fieldset>
+   <fieldset id="recv">
+    <h3>Receiver</h3>
+    <div class="field">
+     <label for="xmit_addr">Address</label>
+     <input name="xmit_addr" id="xmit_addr" size="50%" disabled/>
+    </div>
+    <center>- OR -</center>
+    <div class="field">
+     <label for="recv_lat">Latitude * **</label>
+     <input name="recv_lat" id="recv_lat" size="12" disabled/>
+    </div>
+    <div class="field">
+     <label for="recv_lont">Longitude * **</label>
+     <input name="recv_lon" id="recv_lon" size="12" disabled/><br/>
+    </div>
+    * Use WGS-84 decimal notation.
+    ** Optional.<br/>
+    <div class="field">
+     <label for="recv_height">Antennae Height (M)</label>
+     <input name="recv_height" id="recv_height" size="7"/>
+    </div>
+    <div class="field">
+     <label for="recv_label">Label</label>
+     <input name="recv_label" id="recv_label" size="50%" disabled/>
+    </div>
+    <div class="field">
+     <label for="recv_radius">Radius</label>
+     <select name="recv_radius" id="recv_radius">
+      <option value="5">5 miles</option>
+      <option value="10">10 miles</option>
+      <option value="15">15 miles</option>
+      <option value="20">20 miles</option>
+      <option value="25">25 miles</option>
+      <option value="50" selected>50 miles</option>
+      <option value="75">75 miles</option>
+      <option value="100">100 miles</option>
+     </select>
+    </div>
+   </fieldset>
+   <fieldset id="buttons">
+    <input type="submit" value="Enqueue"/>
+    <input type="reset" value="Reset"/>
+   </fieldset>
+   <br/>
+   Your plot will be generated in awhile (typically 10-15 minutes), uploaded, and a link emailed to you.<br/>
+  </form>
+ </body>
+</html>
